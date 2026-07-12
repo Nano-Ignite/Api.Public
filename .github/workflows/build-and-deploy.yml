@@ -62,107 +62,107 @@ jobs:
           $env:KUBERNETES_CLUSTER = az aks list -g $env:AZURE_GROUP_KUBERNETES --query [0].name -o tsv;
           az aks get-credentials -g $env:AZURE_GROUP_KUBERNETES -n $env:KUBERNETES_CLUSTER --overwrite -o none;
 
-      # - name: Build Solution
-      #   shell: pwsh
-      #   run: |
-      #     dotnet nuget add source $env:NUGET_HOST -n private -u $env:NUGET_USERNAME -p $env:NUGET_PASSWORD --store-password-in-clear-text;
+      - name: Build Solution
+        shell: pwsh
+        run: |
+          dotnet nuget add source $env:NUGET_HOST -n private -u $env:NUGET_USERNAME -p $env:NUGET_PASSWORD --store-password-in-clear-text;
 
-      #     dotnet build -c Release .\$env:APP_NAME.sln;
+          dotnet build -c Release .\$env:APP_NAME.sln;
 
-      #     if ($LastExitCode -ne 0)
-      #     { 
-      #         throw "error";
-      #     };
+          if ($LastExitCode -ne 0)
+          { 
+              throw "error";
+          };
 
-      # - name: Test Solution
-      #   shell: pwsh
-      #   run: |
-      #     dotnet test .\.tests\Tests.$env:APP_NAME\Tests.$env:APP_NAME.csproj;
+      - name: Test Solution
+        shell: pwsh
+        run: |
+          dotnet test .\.tests\Tests.$env:APP_NAME\Tests.$env:APP_NAME.csproj;
 
-      #     if ($LastExitCode -ne 0)
-      #     { 
-      #       throw "error";
-      #     };
+          if ($LastExitCode -ne 0)
+          { 
+            throw "error";
+          };
 
-      # - name: Build & Push Image
-      #   shell: pwsh
-      #   run: |
-      #     $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
+      - name: Build & Push Image
+        shell: pwsh
+        run: |
+          $env:CONTAINER_REGISTRY_HOST = az acr list -g $env:AZURE_GROUP_DELIVERY --query [0].loginServer -o tsv;
 
-      #     az acr build `
-      #         --registry $env:CONTAINER_REGISTRY_HOST `
-      #         --agent-pool buildpool `
-      #         -t "$($env:IMAGE_NAME):latest" `
-      #         -t "$($env:IMAGE_NAME):$($env:VERSION)" `
-      #         --build-arg DOTNET_SDK_VERSION=$env:DOTNET_SDK_VERSION `
-      #         --build-arg DOTNET_ASPNET_VERSION=$env:DOTNET_ASPNET_VERSION `
-      #         --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
-      #         --build-arg NUGET_HOST=$env:NUGET_HOST `
-      #         --build-arg NUGET_USERNAME=$env:NUGET_USERNAME `
-      #         --build-arg NUGET_PASSWORD=$env:NUGET_PASSWORD `
-      #         ./
+          az acr build `
+              --registry $env:CONTAINER_REGISTRY_HOST `
+              --agent-pool buildpool `
+              -t "$($env:IMAGE_NAME):latest" `
+              -t "$($env:IMAGE_NAME):$($env:VERSION)" `
+              --build-arg DOTNET_SDK_VERSION=$env:DOTNET_SDK_VERSION `
+              --build-arg DOTNET_ASPNET_VERSION=$env:DOTNET_ASPNET_VERSION `
+              --build-arg CONTAINER_REGISTRY_SOURCE_LABEL=https://github.com/$env:GITHUB_REPOSITORY `
+              --build-arg NUGET_HOST=$env:NUGET_HOST `
+              --build-arg NUGET_USERNAME=$env:NUGET_USERNAME `
+              --build-arg NUGET_PASSWORD=$env:NUGET_PASSWORD `
+              ./
 
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     };  
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          };  
 
-      #     echo "CONTAINER_REGISTRY_HOST=$env:CONTAINER_REGISTRY_HOST" >> $env:GITHUB_ENV;
+          echo "CONTAINER_REGISTRY_HOST=$env:CONTAINER_REGISTRY_HOST" >> $env:GITHUB_ENV;
 
-      # - name: Kubernetes Deploy
-      #   shell: pwsh
-      #   run: |
-      #     $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
+      - name: Kubernetes Deploy
+        shell: pwsh
+        run: |
+          $zoneNames = az network dns zone list -g $env:AZURE_GROUP_DNS --query "[].name" -o json | ConvertFrom-Json
 
-      #     $env:ROUTE_HOST_NAMES = (
-      #         $zoneNames | ForEach-Object {
-      #             "  - $env:SUB_DOMAIN_NAME.$_"
-      #         }
-      #     ) -join "`n"
+          $env:ROUTE_HOST_NAMES = (
+              $zoneNames | ForEach-Object {
+                  "  - $env:SUB_DOMAIN_NAME.$_"
+              }
+          ) -join "`n"
 
-      #     $env:GATEWAY_NAME = kubectl get gateway -n $env:KUBERNETES_NAMESPACE -o jsonpath='{.items[0].metadata.name}'
+          $env:GATEWAY_NAME = kubectl get gateway -n $env:KUBERNETES_NAMESPACE -o jsonpath='{.items[0].metadata.name}'
 
-      #     Get-Content .kubernetes/service.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/service.tmp.yaml;
-      #     kubectl apply -f .kubernetes/service.tmp.yaml;
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     }
+          Get-Content .kubernetes/service.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/service.tmp.yaml;
+          kubectl apply -f .kubernetes/service.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
 
-      #     Get-Content .kubernetes/configmap.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/configmap.tmp.yaml;
-      #     kubectl apply -f .kubernetes/configmap.tmp.yaml;
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     }
+          Get-Content .kubernetes/configmap.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/configmap.tmp.yaml;
+          kubectl apply -f .kubernetes/configmap.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
 
-      #     Get-Content .kubernetes/deployment.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/deployment.tmp.yaml;
-      #     kubectl apply -f .kubernetes/deployment.tmp.yaml;
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     }
+          Get-Content .kubernetes/deployment.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/deployment.tmp.yaml;
+          kubectl apply -f .kubernetes/deployment.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
 
-      #     Get-Content .kubernetes/autoscaler.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/autoscaler.tmp.yaml;
-      #     kubectl apply -f .kubernetes/autoscaler.tmp.yaml;
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     }
+          Get-Content .kubernetes/autoscaler.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/autoscaler.tmp.yaml;
+          kubectl apply -f .kubernetes/autoscaler.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
 
-      #     Get-Content .kubernetes/httproute-80.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/httproute-80.tmp.yaml;
-      #     kubectl apply -f .kubernetes/httproute-80.tmp.yaml;
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     }
+          Get-Content .kubernetes/httproute-80.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/httproute-80.tmp.yaml;
+          kubectl apply -f .kubernetes/httproute-80.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
 
-      #     Get-Content .kubernetes/httproute-443.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/httproute-443.tmp.yaml;
-      #     kubectl apply -f .kubernetes/httproute-443.tmp.yaml;
-      #     if ($LastExitCode -ne 0) 
-      #     { 
-      #         throw "error";
-      #     }
+          Get-Content .kubernetes/httproute-443.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/httproute-443.tmp.yaml;
+          kubectl apply -f .kubernetes/httproute-443.tmp.yaml;
+          if ($LastExitCode -ne 0) 
+          { 
+              throw "error";
+          }
 
       - name: Add Availability Check
         shell: pwsh
