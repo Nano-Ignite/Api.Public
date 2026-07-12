@@ -235,7 +235,7 @@ jobs:
                       {
                           "location": "global",
                           "properties": {
-                              "severity": ¨1,
+                              "severity": 1,
                               "enabled": true,
                               "scopes": ["$env:WEB_TEST_ID", "$env:APPLICATION_INSIGHT_ID"],
                               "evaluationFrequency": "PT1M",
@@ -251,8 +251,7 @@ jobs:
                                       "actionGroupId": "$env:ACTION_GROUP_ID"
                                   }
                               ]                          }
-                      }
-                      "@;
+                      }"@;
 
                       $env:ALERT_RULE_JSON | Out-File -FilePath alert.json -Encoding utf8;
 
