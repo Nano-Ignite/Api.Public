@@ -231,30 +231,27 @@ jobs:
                       $env:WEB_TEST_ID = az monitor app-insights web-test show -g $env:AZURE_GROUP_LOGS -n $env:WEB_TEST_NAME --query id -o tsv;
                       $env:ACTION_GROUP_ID = az monitor action-group list -g $env:AZURE_GROUP_LOGS --query [0].id -o tsv;
 
-                      $env:ALERT_RULE_JSON = @"
-                      {
-                          "location": "global",
-                          "properties": {
-                              "severity": 1,
-                              "enabled": true,
-                              "scopes": ["$env:WEB_TEST_ID", "$env:APPLICATION_INSIGHT_ID"],
-                              "evaluationFrequency": "PT1M",
-                              "windowSize": "PT5M",
-                              "criteria": {
-                                  "odata.type": "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria",
-                                  "webTestId": "$env:WEB_TEST_ID",
-                                  "componentId": "$env:APPLICATION_INSIGHT_ID",
-                                  "failedLocationCount": 2
-                              },
-                              "actions": [
-                                  {
-                                      "actionGroupId": "$env:ACTION_GROUP_ID"
-                                  }
-                              ]                          }
+                      $alertRule = @{
+                          location   = "global"
+                          properties = @{
+                              severity            = 1
+                              enabled              = $true
+                              scopes               = @($env:WEB_TEST_ID, $env:APPLICATION_INSIGHT_ID)
+                              evaluationFrequency  = "PT1M"
+                              windowSize           = "PT5M"
+                              criteria             = @{
+                                  "odata.type"     = "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria"
+                                  webTestId        = $env:WEB_TEST_ID
+                                  componentId      = $env:APPLICATION_INSIGHT_ID
+                                  failedLocationCount = 2
+                              }
+                              actions = @(
+                                  @{ actionGroupId = $env:ACTION_GROUP_ID }
+                              )
+                          }
                       }
-          "@;
 
-                      $env:ALERT_RULE_JSON | Out-File -FilePath alert.json -Encoding utf8;
+                      $alertRule | ConvertTo-Json -Depth 10 | Out-File -FilePath alert.json -Encoding utf8
 
                       az resource create `
                           -g $env:AZURE_GROUP_LOGS `
