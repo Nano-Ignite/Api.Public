@@ -197,8 +197,6 @@ jobs:
                   $env:HIDDEN_LINK = 'hidden-link:' + $env:APPLICATION_INSIGHT_ID + '=Resource';
                   $env:WEB_TEST_NAME = $env:SERVICE_NAME + '-availability-' + $env:ASPNETCORE_ENVIRONMENT.ToLower() + '-' + ($zoneName.TrimEnd('.') -replace '\.', '-')
 
-                  echo $env:AZURE_LOCATION;
-
                   az monitor app-insights web-test show -g $env:AZURE_GROUP_LOGS -n $env:WEB_TEST_NAME --query id -o tsv 2>$null
 
                   if ($LastExitCode -ne 0)
