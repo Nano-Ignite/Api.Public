@@ -168,6 +168,7 @@ jobs:
         shell: pwsh
         run: |
           $env:WORKSPACE_ID = az monitor log-analytics workspace list -g $env:AZURE_GROUP_LOGS --query [0].id -o tsv;
+          $env:AZURE_LOCATION = az monitor log-analytics workspace list -g $env:AZURE_GROUP_LOGS --query [0].location -o tsv;
           
           if (-not [string]::IsNullOrEmpty($env:WORKSPACE_ID))
           {
@@ -195,7 +196,6 @@ jobs:
               {
                   $env:HIDDEN_LINK = 'hidden-link:' + $env:APPLICATION_INSIGHT_ID + '=Resource';
                   $env:WEB_TEST_NAME = $env:SERVICE_NAME + '-availability-' + $env:ASPNETCORE_ENVIRONMENT.ToLower() + '-' + ($zone.TrimEnd('.') -replace '\.', '-')
-                  $env:AZURE_LOCATION = az monitor log-analytics workspace list -g $env:AZURE_GROUP_LOGS --query [0].location -o tsv;
 
                   echo $env:AZURE_LOCATION;
 
