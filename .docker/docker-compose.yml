@@ -14,6 +14,81 @@ services:
     networks:
       - network
 
+  clamav: 
+    image: clamav/clamav
+    hostname: clamav
+    ports:
+      - 3310:3310
+    networks:
+      - network
+  
+  svc.users:
+    image: ghcr.io/krownsoft/svc.users:latest
+    hostname: svc-users
+    depends_on:
+      - eventing
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Data__UseMigrateDatabase: false
+      Data__ConnectionString: ${SVC_USERS_CONNECTIONSTRING}
+      Security__Jwt__PublicKey: MIIBCgKCAQEA03il89BRPf9MEj2A3ns5ccRQ6i+fryPMxeL+syBrKeedcwzUI43rudd0suuDr1U6tTW0GVHnMFAWpF68DkVewSb6NEgpzICbMcdIskkFDDW1ZsXcsGUag7/Mt4Dd1R3DgtzhRdXC/rlWwetPl3XkXv2rsSBMEmi5qnRLK9WhpzzGfWDON/WmlB1VnIg9Uqm2VtH3Eo21ejQVE5ZOAid6+lDwx9Ktz16W8OYAhIixMBesFnOTwY5rVjBRzsv22tqLY9QkHoUAd8cme/pHhV3z3GZh56X6logvWEqSIF3FtFD8lJdKF24Atunj18VMC/izl3m7X+arZSL8oD+819/qnQIDAQAB
+      Security__Jwt__PrivateKey: MIIEpAIBAAKCAQEA03il89BRPf9MEj2A3ns5ccRQ6i+fryPMxeL+syBrKeedcwzUI43rudd0suuDr1U6tTW0GVHnMFAWpF68DkVewSb6NEgpzICbMcdIskkFDDW1ZsXcsGUag7/Mt4Dd1R3DgtzhRdXC/rlWwetPl3XkXv2rsSBMEmi5qnRLK9WhpzzGfWDON/WmlB1VnIg9Uqm2VtH3Eo21ejQVE5ZOAid6+lDwx9Ktz16W8OYAhIixMBesFnOTwY5rVjBRzsv22tqLY9QkHoUAd8cme/pHhV3z3GZh56X6logvWEqSIF3FtFD8lJdKF24Atunj18VMC/izl3m7X+arZSL8oD+819/qnQIDAQABAoIBAQDNm7h+3kSfauGjunjZ2CV6H84sZDF2L/ChVpsdvp9zFudXPVnlV8+h2YJ1k9dtWgjCt3xsQd3uc3AQUKu3lGsUkbkjrCY317MNKx3benOV84J0clyohSTKhGme4YTN+SpmyiudosD8uWdJFGlGcjGgyjNs/GH6ZChhOsD71bJezkwX/7YvMjvL0Iep5dVh708aC4I6jLo3X7TVX7RTEqy35/B/2zmaH4YzlXzJZBpIdPSP+f4oGTCd8eTunEXMZLGDW4AIA6yCdZdwGx2CuM9myJ96bsCGJmFWntGAU4IxZ9uf4A1MNsLIHhIuP7Hlvo9U7LZZYnTN/bsKtUz5cHVhAoGBAObYgTsIQPlg6sLn/U8SW8B8yzClp/YeyngUoWO6gKAa/SIZ2Sd04JdOsICKk7JNKrBb8TXm53PoVxYYrsDps6ysPm+ylaSS6ijiZkW+WvpzyZcp7voZyU0KoAyWRhuE/e90MBpXHYfbFqtvfLW6jxOXcgKIzc+taCvbgaWl7ov3AoGBAOqDsF4gZ7hL3TnLZ5xsD6rtK/oNDu6/fZ62CyZOsdDVibSdR10QPip/KTBFrT43nopAmw7gT8Qi2rt34pGKQny4Xj+kAWdgLafsGuDn/qBx7uLVkf8Fca8uAchtb13MjE4+mbkSKQHpKPZXTkaF7bPZWUghd523dmJMqfCRL5ELAoGAeNPz+HEeiSk4V+JTzRJ/4eWv+PuMSZ/ePDIYM3oIH0VhH3tGFYfwkmIGspFWM2p+oKbPP3ZnyVxgUNmEhscMW6IgYBiqiOS5GcM+4tx7BEKczrmNM21R1zhrg4sYkQjwXWiEURUuCNEdMYh+TySiBRAtBbSTfVN3hhUz6/9JOAsCgYAFWmw0OdkkQ9cQ8quyzmStKizO0G1+1bAwZ0dp4HH+qmEyVkTCwxQoNC7kgzKpMOvVjBP+CvDHMWR80wfA+r75yduc6El/6pogMyuJ5sHRN8iUNPvYLm+h6BLyWE0qfvjU8Gjh6KA3AvOEbAnFYllCubtoAhuQ5hc1tzpJ24aScQKBgQCc7Wl/sofZ3+oYiVkLwv1CmDYrog3SUCXDNJLBPww23R+06E9tVtyCvXWqGkMfnAx+ipoD80lGX/jHpUL+GuEnOUB737DxGa8XWjgzApfWt1/f8S8BOw7DMUF1Yyk8jd/XkFBLY9us3kFGFAkZA35aej4qLtWnX1q4nlcJSXdZ9Q==
+    networks:
+      - network
+    volumes:
+      - C:\krown\svc-users:/mnt/svc-users
+
+  svc.places:
+    image: ghcr.io/krownsoft/svc.places:latest
+    hostname: svc-places
+    depends_on:
+      - eventing
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Data__UseMigrateDatabase: false
+      Data__ConnectionString: ${SVC_PLACES_CONNECTIONSTRING}
+      Security__Jwt__PublicKey: MIIBCgKCAQEA03il89BRPf9MEj2A3ns5ccRQ6i+fryPMxeL+syBrKeedcwzUI43rudd0suuDr1U6tTW0GVHnMFAWpF68DkVewSb6NEgpzICbMcdIskkFDDW1ZsXcsGUag7/Mt4Dd1R3DgtzhRdXC/rlWwetPl3XkXv2rsSBMEmi5qnRLK9WhpzzGfWDON/WmlB1VnIg9Uqm2VtH3Eo21ejQVE5ZOAid6+lDwx9Ktz16W8OYAhIixMBesFnOTwY5rVjBRzsv22tqLY9QkHoUAd8cme/pHhV3z3GZh56X6logvWEqSIF3FtFD8lJdKF24Atunj18VMC/izl3m7X+arZSL8oD+819/qnQIDAQAB
+    networks:
+      - network
+    volumes:
+      - C:\krown\svc-places:/mnt/svc-places
+
+  svc.events:
+    image: ghcr.io/krownsoft/svc.events:latest
+    hostname: svc-events
+    depends_on:
+      - eventing
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Data__UseMigrateDatabase: false
+      Data__ConnectionString: ${SVC_EVENTS_CONNECTIONSTRING}
+      Security__Jwt__PublicKey: MIIBCgKCAQEA03il89BRPf9MEj2A3ns5ccRQ6i+fryPMxeL+syBrKeedcwzUI43rudd0suuDr1U6tTW0GVHnMFAWpF68DkVewSb6NEgpzICbMcdIskkFDDW1ZsXcsGUag7/Mt4Dd1R3DgtzhRdXC/rlWwetPl3XkXv2rsSBMEmi5qnRLK9WhpzzGfWDON/WmlB1VnIg9Uqm2VtH3Eo21ejQVE5ZOAid6+lDwx9Ktz16W8OYAhIixMBesFnOTwY5rVjBRzsv22tqLY9QkHoUAd8cme/pHhV3z3GZh56X6logvWEqSIF3FtFD8lJdKF24Atunj18VMC/izl3m7X+arZSL8oD+819/qnQIDAQAB
+    networks:
+      - network
+    volumes:
+      - C:\krown\svc-events:/mnt/svc-event
+
+  svc.messaging:
+    image: ghcr.io/krownsoft/svc.messaging:latest
+    hostname: svc-messaging
+    depends_on:
+      - eventing
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Data__UseMigrateDatabase: false
+      Data__ConnectionString: ${SVC_MESSAGING_CONNECTIONSTRING}
+      Security__Jwt__PublicKey: MIIBCgKCAQEA03il89BRPf9MEj2A3ns5ccRQ6i+fryPMxeL+syBrKeedcwzUI43rudd0suuDr1U6tTW0GVHnMFAWpF68DkVewSb6NEgpzICbMcdIskkFDDW1ZsXcsGUag7/Mt4Dd1R3DgtzhRdXC/rlWwetPl3XkXv2rsSBMEmi5qnRLK9WhpzzGfWDON/WmlB1VnIg9Uqm2VtH3Eo21ejQVE5ZOAid6+lDwx9Ktz16W8OYAhIixMBesFnOTwY5rVjBRzsv22tqLY9QkHoUAd8cme/pHhV3z3GZh56X6logvWEqSIF3FtFD8lJdKF24Atunj18VMC/izl3m7X+arZSL8oD+819/qnQIDAQAB
+    networks:
+      - network
+
 networks:
   network:
     name: network
