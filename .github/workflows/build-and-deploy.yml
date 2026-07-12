@@ -43,10 +43,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build-and-deploy:
-    runs-on:
-      - self-hosted
-      - linux 
-      - ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}
+    runs-on: ubuntu-latest
+#      - self-hosted
+#      - linux 
+#      - ${{ github.ref == 'refs/heads/main' && 'Production' || 'Staging' }}
     permissions:
       contents: write
       packages: write
@@ -251,7 +251,8 @@ jobs:
                                       "actionGroupId": "$env:ACTION_GROUP_ID"
                                   }
                               ]                          }
-                      }"@;
+                      }
+          "@;
 
                       $env:ALERT_RULE_JSON | Out-File -FilePath alert.json -Encoding utf8;
 
