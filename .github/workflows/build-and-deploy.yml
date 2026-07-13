@@ -211,10 +211,9 @@ jobs:
                   }
               }
 
+              $env:WEB_TEST_ALERT_NAME = $env:WEB_TEST_NAME + "-alert";
 
-              $env:WEB_TEST_ALERT_NAME = $env:WEB_TEST_NAME + "-alert" --query id -o tsv 2>$null
-
-              az resource show -g $env:AZURE_GROUP_LOGS -n $env:WEB_TEST_ALERT_NAME;
+              az resource show -g $env:AZURE_GROUP_LOGS -n $env:WEB_TEST_ALERT_NAME --query id -o tsv 2>$null;
 
               if ($LastExitCode -ne 0)
               {
