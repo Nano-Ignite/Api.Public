@@ -226,10 +226,10 @@ jobs:
                   )
               }
 
-              #$json = $alertRuleProperties | ConvertTo-Json -Depth 10
-              #[System.IO.File]::WriteAllText("$PWD/alert.json", $json, [System.Text.UTF8Encoding]::new($false))
+              $json = $alertRuleProperties | ConvertTo-Json -Depth 10
+              [System.IO.File]::WriteAllText("$PWD/alert.json", $json, [System.Text.UTF8Encoding]::new($false))
 
-              $json | Set-Content -Path alert.json -Encoding utf8NoBOM
+              #$json | Set-Content -Path alert.json -Encoding utf8NoBOM
 
               az resource create `
                   -g $env:AZURE_GROUP_LOGS `
