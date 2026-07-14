@@ -16,8 +16,9 @@ spec:
       filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
-            remove:
-              - Server
+            set:
+              - name: Server
+                value: "N/A"
       backendRefs:
         - name: %SERVICE_NAME%
           port: 8080

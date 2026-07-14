@@ -17,5 +17,6 @@ spec:
             statusCode: 301
         - type: ResponseHeaderModifier
           responseHeaderModifier:
-            remove:
-              - Server
+            set:
+              - name: Server
+                value: "N/A"
