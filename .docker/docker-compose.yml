@@ -12,6 +12,9 @@ services:
     depends_on:
       - clamav
       - svc.accounts
+      - svc.places
+      - svc.locations
+      - svc.emailing
     volumes:
       - ../:/root/.dotnet/https
     networks:
