@@ -13,12 +13,6 @@ spec:
         - path:
             type: PathPrefix
             value: /
-      filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            set:
-              - name: Server
-                value: "N/A"
       backendRefs:
         - name: %SERVICE_NAME%
           port: 8080

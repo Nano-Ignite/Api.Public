@@ -15,8 +15,3 @@ spec:
           requestRedirect:
             scheme: https
             statusCode: 301
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            set:
-              - name: Server
-                value: "N/A"
