@@ -15,3 +15,7 @@ spec:
           requestRedirect:
             scheme: https
             statusCode: 301
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            remove:
+              - Server
