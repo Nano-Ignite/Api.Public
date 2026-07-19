@@ -165,6 +165,13 @@ jobs:
               throw "error";
           }
 
+          Get-Content .kubernetes/service-monitor.yaml | foreach { [Environment]::ExpandEnvironmentVariables($_) } | Set-Content .kubernetes/service-monitor.tmp.yaml;
+          kubectl apply -f .kubernetes/service-monitor.tmp.yaml;
+          if ($LastExitCode -ne 0)
+          { 
+              throw "error";
+          };
+
       - name: Add Availability Check
         shell: pwsh
         run: |
